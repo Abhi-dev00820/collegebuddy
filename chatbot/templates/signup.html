@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basepython - Signup</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="Login">
+        <h1>Chatbot Signup</h1>
+
+        <form method="POST" action="{{ url_for('signup') }}">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="UsernameS" placeholder="Enter your username" maxlength="20" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="PasswordS" placeholder="Enter your password" required>
+
+            <input type="submit" value="Sign Up">
+
+            <p>
+                Already have an account?
+                <a href="{{ url_for('login') }}">Log in</a>
+            </p>
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <p class="flash-message">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Basepython Chatbot</title>
+
+    <style>
+        /* Global page styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #10131b;
+            color: #edf0f7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Main chatbot container */
+        .chat-container {
+            width: 100%;
+            max-width: 780px;
+            height: min(720px, 90vh);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #191e2a;
+            border: 1px solid #30394b;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 20px;
+            border-bottom: 1px solid #30394b;
+            background: #1d2432;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            background: #536dfe;
+            border-radius: 14px;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            font-size: 19px;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #8fe0ad;
+        }
+
+        .logout {
+            color: #c5cce0;
+            text-decoration: none;
+            border: 1px solid #414a5e;
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 13px;
+        }
+
+        .logout:hover {
+            background: #30394b;
+        }
+
+        /* Conversation area */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 82%;
+            padding: 13px 16px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #272f40;
+            color: #edf0f7;
+            border-bottom-left-radius: 4px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #536dfe;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Initial welcome message */
+        .welcome {
+            text-align: center;
+            margin: auto 0;
+            padding: 25px 10px;
+            color: #aab4ca;
+        }
+
+        .welcome .welcome-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .welcome h2 {
+            color: #f2f4fa;
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Message composer */
+        .chat-form {
+            padding: 18px 20px;
+            border-top: 1px solid #30394b;
+            background: #1d2432;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #message-input {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 16px;
+            border: 1px solid #414a5e;
+            border-radius: 12px;
+            outline: none;
+            background: #111621;
+            color: white;
+            font-size: 14px;
+        }
+
+        #message-input:focus {
+            border-color: #7185ff;
+        }
+
+        #message-input::placeholder {
+            color: #7e8aa3;
+        }
+
+        #send-button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            background: #536dfe;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background: #4059e8;
+        }
+
+        #send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .hint {
+            text-align: center;
+            color: #77839b;
+            font-size: 11px;
+            margin-top: 12px;
+        }
+
+        /* Small-screen layout */
+        @media (max-width: 500px) {
+            body {
+                padding: 0;
+            }
+
+            .chat-container {
+                height: 100vh;
+                min-height: 0;
+                border-radius: 0;
+            }
+
+            .chat-messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .chat-header {
+                padding: 15px;
+            }
+
+            .chat-form {
+                padding: 14px;
+            }
+
+            #send-button {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="chat-container">
+
+        <!-- Application header -->
+        <header class="chat-header">
+            <div class="brand">
+                <div class="bot-avatar">🤖</div>
+
+                <div>
+                    <h1>Basepython</h1>
+                    <p class="status">● Ready to chat</p>
+                </div>
+            </div>
+
+            <a class="logout" href="{{ url_for('logout') }}">
+                Logout
+            </a>
+        </header>
+
+        <!-- Messages are inserted here using JavaScript -->
+        <section
+            class="chat-messages"
+            id="chat-messages"
+            aria-live="polite"
+            aria-label="Chat conversation"
+        >
+            <div class="welcome" id="welcome">
+                <div class="welcome-icon">💬</div>
+                <h2>What's on your mind?</h2>
+                <p>
+                    Start a conversation with Basepython.
+                    You can talk about your day, college, coding,
+                    or whatever is on your mind.
+                </p>
+            </div>
+        </section>
+
+        <!-- Message input -->
+        <form class="chat-form" id="chat-form">
+            <div class="input-row">
+                <input
+                    type="text"
+                    id="message-input"
+                    name="message"
+                    placeholder="Type your message..."
+                    maxlength="1000"
+                    autocomplete="off"
+                    aria-label="Your message"
+                    required
+                >
+
+                <button type="submit" id="send-button">
+                    Send ➤
+                </button>
+            </div>
+
+            <p class="hint">
+                Basepython uses a predefined dataset and fuzzy matching.
+            </p>
+        </form>
+
+    </main>
+
+    <script>
+        // References to the interface elements
+        const chatForm = document.getElementById("chat-form");
+        const messageInput = document.getElementById("message-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const sendButton = document.getElementById("send-button");
+        const welcome = document.getElementById("welcome");
+
+        // Add a message to the conversation safely.
+        // textContent prevents user messages from being
+        // interpreted as HTML.
+        function addMessage(text, sender) {
+            if (welcome) {
+                welcome.remove();
+            }
+
+            const messageElement = document.createElement("div");
+
+            messageElement.classList.add(
+                "message",
+                sender === "user" ? "user-message" : "bot-message"
+            );
+
+            messageElement.textContent = text;
+
+            chatMessages.appendChild(messageElement);
+
+            // Keep the newest message visible.
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Submit a message to the Flask backend.
+        chatForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const message = messageInput.value.trim();
+
+            if (!message || sendButton.disabled) {
+                return;
+            }
+
+            addMessage(message, "user");
+
+            messageInput.value = "";
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending...";
+
+            try {
+                const response = await fetch("/chatbot", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // A session may expire while the page is open.
+                if (response.status === 401) {
+                    addMessage(
+                        "Your session has expired. Please log in again.",
+                        "bot"
+                    );
+
+                    window.location.href = "/";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error || "The server could not process your message."
+                    );
+                }
+
+                addMessage(data.response, "bot");
+
+            } catch (error) {
+                console.error("Chat request failed:", error);
+
+                addMessage(
+                    "I couldn't connect to the server. Please try again.",
+                    "bot"
+                );
+
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = "Send ➤";
+                messageInput.focus();
+            }
+        });
+
+        // Focus the input when the page loads.
+        messageInput.focus();
+    </script>
+
+</body>
+</html>
