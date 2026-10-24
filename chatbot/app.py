@@ -12,14 +12,11 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from rapidfuzz import fuzz, process
 
-
-# --------------------------------------------------
-# Flask configuration
-# --------------------------------------------------
+# Flask configs
 
 app = Flask(__name__)
 
-# Set SECRET_KEY in your environment before deployment.
+
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-change-me")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
@@ -28,9 +25,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
-# --------------------------------------------------
-# Database model
-# --------------------------------------------------
+# model
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -208,11 +203,7 @@ CHATBOT_DATA = {
 }
 
 
-# --------------------------------------------------
 # Text normalization
-# Convert messages to a consistent format before
-# matching. Example: "HEY!!!" becomes "hey".
-# --------------------------------------------------
 
 def normalize_text(text):
     text = text.lower().strip()
@@ -221,8 +212,6 @@ def normalize_text(text):
     return text
 
 
-# Create one searchable dictionary from all examples.
-# Each normalized phrase points to its intent.
 PATTERN_TO_INTENT = {}
 
 for intent, details in CHATBOT_DATA.items():
@@ -231,9 +220,7 @@ for intent, details in CHATBOT_DATA.items():
         PATTERN_TO_INTENT[normalized_pattern] = intent
 
 
-# --------------------------------------------------
-# Fuzzy matching and response generation
-# --------------------------------------------------
+# fuzzy matching and response generation
 
 def generate_response(user_message):
     message = normalize_text(user_message)
@@ -293,11 +280,6 @@ def login_required(view):
     return wrapped_view
 
 
-# --------------------------------------------------
-# Login page
-# Existing form fields: UsernameL and PasswordL
-# --------------------------------------------------
-
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -316,10 +298,6 @@ def login():
     return render_template("login.html")
 
 
-# --------------------------------------------------
-# Signup page
-# Existing form fields: UsernameS and PasswordS
-# --------------------------------------------------
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -339,7 +317,7 @@ def signup():
             flash("User already exists. Please log in.")
             return render_template("signup.html")
 
-        # Never store a new user's password as plain text.
+        
         new_user = User(
             username=username,
             password=generate_password_hash(password)
@@ -354,9 +332,7 @@ def signup():
     return render_template("signup.html")
 
 
-# --------------------------------------------------
 # Main chatbot page
-# --------------------------------------------------
 
 @app.route("/index")
 @login_required
@@ -364,10 +340,9 @@ def index():
     return render_template("index.html")
 
 
-# --------------------------------------------------
+
 # Chat API
 # Receives {"message": "..."} and returns JSON.
-# --------------------------------------------------
 
 @app.route("/chatbot", methods=["POST"])
 @login_required
@@ -391,9 +366,7 @@ def chatbot():
     return jsonify({"response": response})
 
 
-# --------------------------------------------------
 # Logout
-# --------------------------------------------------
 
 @app.route("/logout")
 def logout():
@@ -401,9 +374,7 @@ def logout():
     return redirect(url_for("login"))
 
 
-# --------------------------------------------------
-# Create database tables and run the application
-# --------------------------------------------------
+# run the application
 
 if __name__ == "__main__":
     with app.app_context():
