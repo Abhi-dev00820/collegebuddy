@@ -8,7 +8,6 @@
     <title>Basepython Chatbot</title>
 
     <style>
-        /* Global page styling */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -26,7 +25,6 @@
             padding: 20px;
         }
 
-        /* Main chatbot container */
         .chat-container {
             width: 100%;
             max-width: 780px;
@@ -41,7 +39,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        /* Header */
+       
         .chat-header {
             display: flex;
             align-items: center;
@@ -91,7 +89,7 @@
             background: #30394b;
         }
 
-        /* Conversation area */
+        
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -126,7 +124,7 @@
             border-bottom-right-radius: 4px;
         }
 
-        /* Initial welcome message */
+        
         .welcome {
             text-align: center;
             margin: auto 0;
@@ -150,7 +148,7 @@
             line-height: 1.6;
         }
 
-        /* Message composer */
+        
         .chat-form {
             padding: 18px 20px;
             border-top: 1px solid #30394b;
@@ -209,7 +207,7 @@
             margin-top: 12px;
         }
 
-        /* Small-screen layout */
+      
         @media (max-width: 500px) {
             body {
                 padding: 0;
@@ -248,7 +246,7 @@
 
     <main class="chat-container">
 
-        <!-- Application header -->
+        
         <header class="chat-header">
             <div class="brand">
                 <div class="bot-avatar">🤖</div>
@@ -264,7 +262,7 @@
             </a>
         </header>
 
-        <!-- Messages are inserted here using JavaScript -->
+        
         <section
             class="chat-messages"
             id="chat-messages"
@@ -309,16 +307,14 @@
     </main>
 
     <script>
-        // References to the interface elements
+        
         const chatForm = document.getElementById("chat-form");
         const messageInput = document.getElementById("message-input");
         const chatMessages = document.getElementById("chat-messages");
         const sendButton = document.getElementById("send-button");
         const welcome = document.getElementById("welcome");
 
-        // Add a message to the conversation safely.
-        // textContent prevents user messages from being
-        // interpreted as HTML.
+      
         function addMessage(text, sender) {
             if (welcome) {
                 welcome.remove();
@@ -335,11 +331,11 @@
 
             chatMessages.appendChild(messageElement);
 
-            // Keep the newest message visible.
+            
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Submit a message to the Flask backend.
+        
         chatForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
@@ -368,7 +364,7 @@
 
                 const data = await response.json();
 
-                // A session may expire while the page is open.
+                
                 if (response.status === 401) {
                     addMessage(
                         "Your session has expired. Please log in again.",
@@ -402,7 +398,7 @@
             }
         });
 
-        // Focus the input when the page loads.
+        
         messageInput.focus();
     </script>
 
